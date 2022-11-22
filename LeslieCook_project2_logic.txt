@@ -1,0 +1,76 @@
+% Leslie Cook 
+% CMPS 5113 - adv programming languages
+% Project 2 - logic
+% This program creates a Family tree using Prolog logic facts and rules.
+% We create a set facts of males of females with names of family members
+% We create a set of rules that define who everyone's parents are
+% Using the the facts (male/female) and rules (parents), we create rules to define the relationships
+% of children, grandparents, brothers, sisters, and come up with at least 2 more relationship rules
+% side note: the "once" function makes sure that Term runs only one time, when a parent is initialized more than once
+
+%facts: family males
+male(rayray).
+male(nathaniel).
+male(steven).
+male(ray).
+male(randy).
+male(ben).
+male(tim).
+male(zach).
+male(bob).
+
+%facts: family females
+female(robin).
+female(leslie).
+female(lindsey).
+female(scotty).
+female(kim).
+female(deana).
+female(mandy).
+female(melissa).
+female(marilyn).
+
+%rules: parent(A,B): A is the parent of B
+parent(leslie, nathaniel).
+parent(steven, nathaniel).
+parent(rayray, leslie).
+parent(robin, leslie).
+parent(rayray, lindsey).
+parent(robin, lindsey).
+parent(scotty, rayray).
+parent(ray, rayray).
+parent(scotty, kim).
+parent(ray, kim).
+parent(scotty, deana).
+parent(ray, deana).
+parent(kim, melissa).
+parent(kim, mandy).
+parent(marilyn, robin).
+parent(bob, robin).
+parent(marilyn, randy).
+parent(bob, randy).
+parent(randy, tim).
+parent(randy, ben).
+parent(randy, zach).
+
+
+%A is the child of B if B is the parent of A.
+child(A,B) :- parent(B,A).
+
+%A is the grandparent of B is they are the parent of the parent of B
+grandparent(A,B) :- parent(A,C), parent(C,B), not(A=B).
+
+%A is the great grandparent of B is they are the grandparent of the parent of B
+great_grandparent(A,B) :- once(parent(C,B)), grandparent(A,C).
+
+%A is the sister of B if they're female, and share a parent with B
+sister(A,B) :- female(A), once(parent(C,A)), parent(C,B), not(A=B).
+ 
+%A is the brother of B if they're male, and share a parent with B
+brother(A,B) :- male(A), once(parent(C,A)), parent(C,B), not(A=B).
+
+%A is the aunt of B if they're the sister of a parent of B
+aunt(A,B) :- sister(A,C), parent(C,B) , not(parent(A,B)).
+
+%A is the uncle of B if they're the brother of a parent of B
+uncle(A,B) :-  brother(A,C), parent(C,B), not(parent(A,B)).
